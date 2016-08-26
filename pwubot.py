@@ -17,7 +17,7 @@ import sys
 #
 #             return val
 
-pwclient = "./pwclient"
+pwclient = "pwclient"
 
 def cached_call( command ):
     if not command in cache :
