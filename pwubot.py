@@ -60,7 +60,7 @@ def get_patch_list( ):
 
 cache = {}
 try :
-    f = open("patchbot.cache", 'rb')
+    f = open("pwubot.cache", 'rb')
     cache = pickle.load(f)
     f.close()
 except : IOError
@@ -96,6 +96,6 @@ if ids != "" :
     sys.stderr.write(pwclient + " update " + ids + " -s 'Superseded'\n")
 
 
-f = open("patchbot.cache", 'wb')
+f = open("pwubot.cache", 'wb')
 pickle.dump(cache, f)
 f.close()
