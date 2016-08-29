@@ -82,10 +82,10 @@ if ids != "" :
 #Find superseeded patches by subject and submitter
 ids = ""
 p = re.compile('[vV]\d+')
-subject_index = sorted((p.sub('v#',e),i) for i,e in enumerate(subject_list))
+subject_index = sorted((p.sub('v#',e),submitter_list[i],i) for i,e in enumerate(subject_list))
 last_index = -1
 for i, item in enumerate(subject_index):
-    j = item[1]
+    j = item[2]
     if last_index >= 0 and subject_index[i][0] == subject_index[last_i][0] and submitter_list[last_index] == submitter_list[j] :
         older = last_index
         if int(id_list[j]) < int(id_list[last_index]) :
