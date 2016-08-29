@@ -4,6 +4,7 @@
 
 import os
 import pickle
+import re
 import subprocess
 import sys
 
@@ -80,11 +81,12 @@ if ids != "" :
 
 #Find superseeded patches by subject and submitter
 ids = ""
-subject_index = sorted((e,i) for i,e in enumerate(subject_list))
+p = re.compile('[vV]\d+')
+subject_index = sorted((p.sub('v#',e),i) for i,e in enumerate(subject_list))
 last_index = -1
 for i, item in enumerate(subject_index):
     j = item[1]
-    if last_index >= 0 and subject_list[last_index] == subject_list[j] and submitter_list[last_index] == submitter_list[j] :
+    if last_index >= 0 and subject_index[i][0] == subject_index[last_i][0] and submitter_list[last_index] == submitter_list[j] :
         older = last_index
         if int(id_list[j]) < int(id_list[last_index]) :
             older = j
@@ -92,6 +94,7 @@ for i, item in enumerate(subject_index):
             sys.stderr.write("DUP: " + id_list[older] + " " + status_list[older] + " " + date_list[older] + " " + submitter_list[older] + " " + subject_list[older] + "\n")
             ids += " " + id_list[older]
     last_index = j
+    last_i = i;
 if ids != "" :
     sys.stderr.write(pwclient + " update " + ids + " -s 'Superseded'\n")
 
