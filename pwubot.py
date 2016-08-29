@@ -43,12 +43,15 @@ patch_list = []
 def get_patch_list( ):
     proc = subprocess.Popen([pwclient, 'list', '-f', '%{id}@#SEP%{state}@#SEP%{name}@#SEP%{date}@#SEP%{delegate}@#SEP%{submitter}'],stdout=subprocess.PIPE)
     sys.stderr.write("loading: ")
+
+    subject_clean = re.compile('\[[^]]*\]')
+
     for line in proc.stdout:
         tmp = line.strip().split('@#SEP')
         if isint(tmp[0]) :
             id_list             .append(tmp[0])
             status_list         .append(tmp[1])
-            subject_list        .append(tmp[2])
+            subject_list        .append(subject_clean.sub('', tmp[2], count=1).strip())
             date_list           .append(tmp[3])
             delegate_list       .append(tmp[4])
             submitter_list      .append(tmp[5])
