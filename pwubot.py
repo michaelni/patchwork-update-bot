@@ -40,6 +40,9 @@ delegate_list = []
 submitter_list = []
 patch_list = []
 
+git_author_list = []
+git_subject_list = []
+
 def get_patch_list( ):
     proc = subprocess.Popen([pwclient, 'list', '-f', '%{id}@#SEP%{state}@#SEP%{name}@#SEP%{date}@#SEP%{delegate}@#SEP%{submitter}'],stdout=subprocess.PIPE)
     sys.stderr.write("loading: ")
@@ -62,6 +65,20 @@ def get_patch_list( ):
     sys.stderr.write("\n")
     return True
 
+def get_git_list( ):
+    proc = subprocess.Popen(['git', 'log', '--pretty=short', '--first-parent', '-1000'],stdout=subprocess.PIPE)
+    sys.stderr.write("giting: ")
+    for line in proc.stdout:
+        if line.startswith('Author: ') :
+            git_author_list.append(line[8:].strip())
+            sys.stderr.write(".")
+        elif line.startswith('    ') :
+            git_subject_list.append(line[4:].strip())
+            sys.stderr.write(":")
+
+    sys.stderr.write("\n")
+    return True
+
 cache = {}
 try :
     f = open("pwubot.cache", 'rb')
@@ -70,7 +87,7 @@ try :
 except : IOError
 
 get_patch_list()
-
+get_git_list()
 
 # Find non applicable (fate failure type patches) which havnt been marked correctly
 ids = ""
@@ -101,6 +118,13 @@ for i, item in enumerate(subject_index):
 if ids != "" :
     sys.stderr.write(pwclient + " update " + ids + " -s 'Superseded'\n")
 
+ids = ""
+for i, item in enumerate(subject_list):
+    if item in git_subject_list and status_list[i] == "New":
+        sys.stderr.write("Applied: " + id_list[i] + " " + status_list[i] + " " + date_list[i] + " " + submitter_list[i] + " " + subject_list[i] + "\n")
+        ids += " " + id_list[i]
+if ids != "" :
+    sys.stderr.write(pwclient + " update " + ids + " -s 'Accepted'\n")
 
 f = open("pwubot.cache", 'wb')
 pickle.dump(cache, f)
