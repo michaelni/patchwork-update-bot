@@ -66,7 +66,7 @@ def get_patch_list( ):
     return True
 
 def get_git_list( ):
-    proc = subprocess.Popen(['git', 'log', '--pretty=short', '--first-parent', '-1000'],stdout=subprocess.PIPE)
+    proc = subprocess.Popen(['git', 'log', '--pretty=short', '--first-parent', '-1000', 'origin/master'],stdout=subprocess.PIPE)
     sys.stderr.write("giting: ")
     for line in proc.stdout:
         if line.startswith('Author: ') :
