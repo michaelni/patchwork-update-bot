@@ -126,6 +126,17 @@ for i, item in enumerate(subject_list):
 if ids != "" :
     sys.stderr.write(pwclient + " update " + ids + " -s 'Accepted'\n")
 
+applied_stat = superseeded_stat = new_stat = 0
+for i, item in enumerate(subject_list):
+    if status_list[i] == "Accepted":
+        applied_stat+=1
+    elif status_list[i] == "Superseded":
+        superseeded_stat+=1
+    elif status_list[i] == "New":
+        new_stat+=1
+
+sys.stderr.write("Accepted: " + str(applied_stat) + " Superseded: " + str(superseeded_stat) + " New: " + str(new_stat) + "\n")
+
 f = open("pwubot.cache", 'wb')
 pickle.dump(cache, f)
 f.close()
