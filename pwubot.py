@@ -43,6 +43,8 @@ patch_list = []
 git_author_list = []
 git_subject_list = []
 
+applied_status_subject_list = []
+
 def get_patch_list( ):
     proc = subprocess.Popen([pwclient, 'list', '-f', '%{id}@#SEP%{state}@#SEP%{name}@#SEP%{date}@#SEP%{delegate}@#SEP%{submitter}'],stdout=subprocess.PIPE)
     sys.stderr.write("loading: ")
@@ -118,9 +120,15 @@ for i, item in enumerate(subject_index):
 if ids != "" :
     sys.stderr.write(pwclient + " update " + ids + " -s 'Superseded'\n")
 
+#Find Accepted patches
+
+for i, item in enumerate(subject_list):
+    if status_list[i] == "Applied":
+        applied_status_subject_list.append(item)
+
 ids = ""
 for i, item in enumerate(subject_list):
-    if item in git_subject_list and status_list[i] == "New":
+    if item in git_subject_list and status_list[i] == "New" and not item in applied_status_subject_list:
         sys.stderr.write("Applied: " + id_list[i] + " " + status_list[i] + " " + date_list[i] + " " + submitter_list[i] + " " + subject_list[i] + "\n")
         ids += " " + id_list[i]
 if ids != "" :
