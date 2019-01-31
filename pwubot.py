@@ -118,9 +118,11 @@ for i, item in enumerate(subject_index):
     j = item[2]
     if last_index >= 0 and subject_index[i][0] == subject_index[last_i][0] and submitter_list[last_index] == submitter_list[j] :
         older = last_index
+        newer = j
         if int(id_list[j]) < int(id_list[last_index]) :
+            newer = older
             older = j
-        if status_list[older] == "New":
+        if status_list[older] == "New" and not status_list[newer] == "Not Applicable":
             sys.stderr.write("DUP: " + id_list[older] + " " + status_list[older] + " " + date_list[older] + " " + submitter_list[older] + " " + subject_list[older] + "\n")
             ids += " " + id_list[older]
     last_index = j
