@@ -44,6 +44,7 @@ git_author_list = []
 git_subject_list = []
 
 applied_status_subject_list = []
+not_applicable_status_subject_list = []
 
 def get_patch_list( ):
     proc = subprocess.Popen([pwclient, 'list', '-f', '%{id}@#SEP%{state}@#SEP%{name}@#SEP%{date}@#SEP%{delegate}@#SEP%{submitter}'],stdout=subprocess.PIPE)
@@ -101,6 +102,13 @@ if ids != "" :
     sys.stderr.write(pwclient + " update " + ids + " -s 'Not Applicable'\n")
 
 
+#Find Accepted / NA patches
+for i, item in enumerate(subject_list):
+    if status_list[i] == "Applied":
+        applied_status_subject_list.append(item)
+    if status_list[i] == "Not Applicable":
+        not_applicable_status_subject_list.append(item)
+
 #Find superseeded patches by subject and submitter
 ids = ""
 p = re.compile('[vV]\d+')
@@ -120,11 +128,6 @@ for i, item in enumerate(subject_index):
 if ids != "" :
     sys.stderr.write(pwclient + " update " + ids + " -s 'Superseded'\n")
 
-#Find Accepted patches
-
-for i, item in enumerate(subject_list):
-    if status_list[i] == "Applied":
-        applied_status_subject_list.append(item)
 
 ids = ""
 for i, item in enumerate(subject_list):
