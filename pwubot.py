@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #Michael Niedermayer
 #GPL 2+
 
@@ -72,6 +72,7 @@ def get_git_list( ):
     proc = subprocess.Popen(['git', 'log', '--pretty=short', '--first-parent', '-1000', 'origin/master'],stdout=subprocess.PIPE)
     sys.stderr.write("giting: ")
     for line in proc.stdout:
+        line = line.decode("utf-8")
         if line.startswith('Author: ') :
             git_author_list.append(line[8:].strip())
             sys.stderr.write(".")
