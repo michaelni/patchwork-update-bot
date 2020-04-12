@@ -39,12 +39,36 @@ date_list = []
 delegate_list = []
 submitter_list = []
 patch_list = []
+version_list = []
+commit_num_list = []
 
 git_author_list = []
 git_subject_list = []
 
 applied_status_subject_list = []
 not_applicable_status_subject_list = []
+
+# segments version number and commit number from subject
+def get_version_commit(subject):
+    subject_clean_re = re.compile('\[[^]]*\]')
+    version_re = re.compile('[vV]\d+')
+    commit_entry_re = re.compile('\d+/\d+')
+
+    label = subject_clean_re.match(subject).group(0)
+    version_match = version_re.findall(label)
+
+    if version_match != []:
+        version_num = int(version_match[0][1:])
+    else:
+        version_num = 1
+
+    commit_entry = commit_entry_re.findall(label)
+    if commit_entry != []:
+        commit_entry_num = int(commit_entry[0].split('/')[0])
+    else:
+        commit_entry_num = 1
+
+    return version_num, commit_entry_num
 
 def get_patch_list( ):
     proc = subprocess.Popen([pwclient, 'list', '-f', '%{id}@#SEP%{state}@#SEP%{name}@#SEP%{date}@#SEP%{delegate}@#SEP%{submitter}'],stdout=subprocess.PIPE)
@@ -58,6 +82,10 @@ def get_patch_list( ):
             id_list             .append(tmp[0])
             status_list         .append(tmp[1])
             subject_list        .append(subject_clean.sub('', tmp[2], count=1).strip())
+
+            version_num, commit_entry_num = get_version_commit(tmp[2])
+            version_list        .append(version_num)
+            commit_num_list     .append(commit_entry_num)
             date_list           .append(tmp[3])
             delegate_list       .append(tmp[4])
             submitter_list      .append(tmp[5])
@@ -123,7 +151,8 @@ for i, item in enumerate(subject_index):
         if int(id_list[j]) < int(id_list[last_index]) :
             newer = older
             older = j
-        if status_list[older] == "New" and not status_list[newer] == "Not Applicable":
+        if status_list[older] == "New" and not status_list[newer] == "Not Applicable" and \
+           commit_num_list[older] == commit_num_list[newer] and version_list[older] <= version_list[newer]:
             sys.stderr.write("DUP: " + id_list[older] + " " + status_list[older] + " " + date_list[older] + " " + submitter_list[older] + " " + subject_list[older] + "\n")
             ids += " " + id_list[older]
     last_index = j
