@@ -19,6 +19,7 @@ import sys
 #             return val
 
 pwclient = "pwclient"
+num_commits = 300 # number of pathes to fetch from patchwork
 
 def cached_call( command ):
     if not command in cache :
@@ -71,7 +72,9 @@ def get_version_commit(subject):
     return version_num, commit_entry_num
 
 def get_patch_list( ):
-    proc = subprocess.Popen([pwclient, 'list', '-f', '%{id}@#SEP%{state}@#SEP%{name}@#SEP%{date}@#SEP%{delegate}@#SEP%{submitter}'],stdout=subprocess.PIPE)
+    num_commits_str = "%d" % num_commits
+    proc = subprocess.Popen([pwclient, 'list', '-N', num_commits_str,
+        '-f','%{id}@#SEP%{state}@#SEP%{name}@#SEP%{date}@#SEP%{delegate}@#SEP%{submitter}'],stdout=subprocess.PIPE)
     sys.stderr.write("loading: ")
 
     subject_clean = re.compile('\[[^]]*\]')
@@ -92,6 +95,7 @@ def get_patch_list( ):
             submitter_list      .append(tmp[5])
 
             sys.stderr.write(tmp[0] + ", ")
+            sys.stderr.flush()
             patch_list          .append(cached_call(pwclient +' view ' + tmp[0]))
 
     sys.stderr.write("\n")
