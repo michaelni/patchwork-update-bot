@@ -77,6 +77,7 @@ def get_patch_list( ):
     subject_clean = re.compile('\[[^]]*\]')
 
     for line in proc.stdout:
+        line = line.decode('utf-8')
         tmp = line.strip().split('@#SEP')
         if isint(tmp[0]) :
             id_list             .append(tmp[0])
